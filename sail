@@ -327,9 +327,11 @@ elif [ "$lower" == "commit" ]; then
     shift 1
     git add .
     git commit -m "${@}"
+    exit
 
 elif [ "$lower" == "push" ]; then
     git push
+    exit
 
 # Proxy PHP commands to the "php" binary on the application container...
 elif [ "$lower" == "php" ]; then
