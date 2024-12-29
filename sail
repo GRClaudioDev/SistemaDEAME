@@ -326,11 +326,67 @@ elif [ "$lower" == "myadmin" ]; then
 elif [ "$lower" == "commit" ]; then
     shift 1
     git add .
-    git commit -m "${@}"
+
+    REGEX_ISSUE_ID="[a-zA-Z0-9,\.\_\-]+-[0-9]+"
+    BRANCH_NAME=$(git symbolic-ref --short HEAD)
+    ISSUE_ID=$(echo "$BRANCH_NAME" | grep -o -E "$REGEX_ISSUE_ID")
+    COMMIT_MESSAGE="$1"
+
+    echo "${ISSUE_ID}"
+    echo "${COMMIT_MESSAGE}"
+
+    if [ -z "$ISSUE_ID" ]; then
+        echo -e "${BRed}O nome da branch não está no padrão.${NC}"
+        exit 1
+    fi
+
+    # i.g. HEY-1: HEY-1: my feature
+    if [[ $COMMIT_MESSAGE == $ISSUE_ID* ]]; then
+        NAME_COMMIT="$COMMIT_MESSAGE"
+    else
+        NAME_COMMIT="$ISSUE_ID: $COMMIT_MESSAGE"
+    fi
+    echo "${NAME_COMMIT}"
+
+exit
+
+
+
+
+    git commit -m "${NAME_COMMIT}"
     exit
 
 elif [ "$lower" == "push" ]; then
-    git push
+    "${DOCKER_COMPOSE[@]}" exec -u sail "$APP_SERVICE" php ./vendor/bin/phpstan
+    if [ $? -ne 0 ]; then
+        echo "Erro ao rodar o LaraStan.";
+        exit 1;
+    fi;
+
+    "${DOCKER_COMPOSE[@]}" exec -u sail "$APP_SERVICE" php artisan test --parallel | php
+    if [ $? -ne 0 ]; then
+        echo "Erro ao Rodar os tests.";
+        exit 1;
+    fi;
+
+    STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep ".php\{0,1\}$") || true
+
+    for FILE in $STAGED_FILES
+    do
+        "${DOCKER_COMPOSE[@]}" exec -u sail "$APP_SERVICE" php ./vendor/bin/pint "${FILE}" > /dev/null >&1;
+        git add "${FILE}";
+    done;
+
+    echo "push"
+    exit 0;
+
+    REGEX_ISSUE_ID="[a-zA-Z0-9,\.\_\-]+-[0-9]+"
+    BRANCH_NAME=$(git symbolic-ref --short HEAD)
+    ISSUE_ID=$(echo "$BRANCH_NAME" | grep -o -E "$REGEX_ISSUE_ID")
+    NAME_COMMIT="$ISSUE_ID: Automatically correcting code formatting with Pint."
+    git commit -m "${NAME_COMMIT}"
+
+    git push -u origin $(git symbolic-ref --short HEAD)
     exit
 
 # Proxy PHP commands to the "php" binary on the application container...
