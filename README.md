@@ -61,3 +61,21 @@ alias sail='bash $([ -f sail ] && echo sail || echo vendor/bin/sail)'
 Não se esqueça de reiniciar o seu shell após esta alteração.
 
 Caso já tenha feito este procedimento anteriomente, seguindo as orientações na documentação do próprio laravel e tenha encontrado um erro na execução do arquivo, no seu comando alias onde troque a palavra sh por bash, para que o comando fique como o mostrado acima.
+
+## Alterações no Script Sail
+
+Alteração do comando open para abrir navegador utilizando o navegador do windows quando usando o WSL2.
+
+Antes de rodar os comandos sail, se não houver um arquivo de configurações .env e existir o arquivo de .env.example, será informado da ausencia do arquivo de confirguração e será perguntado se deseja criar um novo arquivo de configuração com base no .env.example. Após a criação do mesmo, será perguntado se deseja executar o comando sail install, para instalar as dependencias do projeto (composer install, key:generate, npm install e npm run build).
+
+Foi criado o comando install para instalar as dependências do projeto (composer install, key:generate, npm install e npm run build).
+
+O comando up inicia os container já em modo desatachado, não sendo necessário utilizar o parametro -d.
+
+O commando stop finaliza os containers baixando e escluindo eles, como se utilizado o comando sail down.
+
+O fomando force executa os comando seguintes direto no docker compose.
+
+O comando ds inicia o servidor LaraDumps.
+
+O comando stan inicia o verificador de código LaraStan.
