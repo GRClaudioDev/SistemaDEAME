@@ -10,6 +10,13 @@ export default {
         './resources/**/*.vue',
     ],
     theme: {
+        colors: {
+            primary: "var(--color-primary)",
+            base: "var(--color-base)",
+            neutral: "var(--color-neutral)",
+            tipografy: "var(--color-tipografy)",
+            title: "var(--color-title)",
+        },
         extend: {
             fontFamily: {
                 sans: ['Roboto', ...defaultTheme.fontFamily.sans],

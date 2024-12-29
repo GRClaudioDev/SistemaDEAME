@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    :root {
+        --color-primary: #14532d;
+        --color-tipografy: #14532d;
+        --color-title: #14532d;
+        --color-base: #dcfce7;
+        --color-neutral: #fff;
+    }
+}
