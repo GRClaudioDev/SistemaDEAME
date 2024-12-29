@@ -377,14 +377,14 @@ elif [ "$lower" == "push" ]; then
         git add "${FILE}";
     done;
 
-    echo "push"
-    exit 0;
-
-    REGEX_ISSUE_ID="[a-zA-Z0-9,\.\_\-]+-[0-9]+"
-    BRANCH_NAME=$(git symbolic-ref --short HEAD)
-    ISSUE_ID=$(echo "$BRANCH_NAME" | grep -o -E "$REGEX_ISSUE_ID")
-    NAME_COMMIT="$ISSUE_ID: Automatically correcting code formatting with Pint."
-    git commit -m "${NAME_COMMIT}"
+    FILES_TO_COMMIT=$(git diff --cached --name-only --diff-filter=ACM)
+    if [ -z "$FILES_TO_COMMIT" ]; then
+        REGEX_ISSUE_ID="[a-zA-Z0-9,\.\_\-]+-[0-9]+"
+        BRANCH_NAME=$(git symbolic-ref --short HEAD)
+        ISSUE_ID=$(echo "$BRANCH_NAME" | grep -o -E "$REGEX_ISSUE_ID")
+        NAME_COMMIT="$ISSUE_ID: Automatically correcting code formatting with Pint."
+        git commit -m "${NAME_COMMIT}"
+    fi
 
     git push -u origin $(git symbolic-ref --short HEAD)
     exit
